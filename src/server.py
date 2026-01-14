@@ -1,6 +1,7 @@
 import argparse
-import uvicorn
+import os
 
+import uvicorn
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
@@ -9,8 +10,16 @@ from a2a.types import (
     AgentCard,
     AgentSkill,
 )
+from loguru import logger
 
 from executor import Executor
+
+logger.remove()
+log_file_path = "logs/server.log"
+if os.path.exists(log_file_path):
+    with open(log_file_path, 'w') as f:
+        f.truncate(0)  # Erase all contents
+logger.add(log_file_path)
 
 
 def main():

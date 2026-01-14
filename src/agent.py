@@ -1,14 +1,14 @@
 from a2a.server.tasks import TaskUpdater
-from a2a.types import Message, TaskState, Part, TextPart
+from a2a.types import Message, Part, TaskState, TextPart
 from a2a.utils import get_message_text, new_agent_text_message
+from loguru import logger
 
-from messenger import Messenger
+from graph import graph
 
 
 class Agent:
     def __init__(self):
-        self.messenger = Messenger()
-        # Initialize other state here
+        pass
 
     async def run(self, message: Message, updater: TaskUpdater) -> None:
         """Implement your agent logic here.
@@ -21,12 +21,16 @@ class Agent:
         """
         input_text = get_message_text(message)
 
-        # Replace this example code with your agent logic
-
         await updater.update_status(
             TaskState.working, new_agent_text_message("Thinking...")
         )
+
+        initial_state = {"problem_description": input_text, "reflections": []}
+        result = graph.invoke(initial_state)
+        response = result["code"]
+        logger.info(f"Agent: {response}")
+
         await updater.add_artifact(
-            parts=[Part(root=TextPart(text=input_text))],
-            name="Echo",
+            parts=[Part(root=TextPart(text=response))],
+            name="Response",
         )
