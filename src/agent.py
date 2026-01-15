@@ -13,7 +13,7 @@ from prompt import DIRECT_PROMPT
 def extract_python_code_block(markdown_string):
     pattern = r"```python\s*\n(.*?)```"
     code_blocks = re.findall(pattern, markdown_string, flags=re.DOTALL | re.IGNORECASE)
-    return code_blocks[0] if code_blocks else None
+    return code_blocks[0] if code_blocks else ""
 
 
 class Agent:
