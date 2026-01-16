@@ -39,7 +39,10 @@ class Agent:
             model="Meta-Llama-3.3-70B-Instruct", max_tokens=8192, temperature=0
         )
         prompt = DIRECT_PROMPT.format(problem=input_text)
-        result = model.invoke(prompt)
+        messages = [
+            ("human", prompt),
+        ]
+        result = model.invoke(messages)
         code = extract_python_code_block(result.content)
 
         logger.info(f"Agent: {code}")
