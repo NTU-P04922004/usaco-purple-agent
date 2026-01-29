@@ -21,7 +21,7 @@ logger.add(log_file_path)
 
 
 async def main():
-    base_url = "http://usaco-purple-agent:9009"
+    base_url = "http://agent:9009"
     async with httpx.AsyncClient() as httpx_client:
         # Initialize A2ACardResolver
         # agent_card_path uses default, extended_agent_card_path also uses default

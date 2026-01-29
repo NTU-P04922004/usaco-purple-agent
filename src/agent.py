@@ -4,10 +4,14 @@ import re
 from a2a.server.tasks import TaskUpdater
 from a2a.types import Message, Part, TaskState, TextPart
 from a2a.utils import get_message_text, new_agent_text_message
-from langchain_sambanova import ChatSambaNova
 from loguru import logger
+from openai import AsyncOpenAI
 
 from prompt import DIRECT_PROMPT
+
+BASE_URL = os.environ.get("BASE_URL", "https://api.sambanova.ai/v1")
+API_KEY = os.environ.get("API_KEY", "dummy")
+MODEL_ID = os.environ.get("MODEL_ID", "Meta-Llama-3.3-70B-Instruct")
 
 
 def extract_python_code_block(markdown_string):
@@ -35,15 +39,18 @@ class Agent:
             TaskState.working, new_agent_text_message("Thinking...")
         )
 
-        model = ChatSambaNova(
-            model="Meta-Llama-3.3-70B-Instruct", max_tokens=8192, temperature=0
+        client = AsyncOpenAI(
+            base_url=BASE_URL,
+            api_key=API_KEY,
         )
         prompt = DIRECT_PROMPT.format(problem=input_text)
         messages = [
-            ("human", prompt),
+            {"role": "user", "content": prompt},
         ]
-        result = model.invoke(messages)
-        code = extract_python_code_block(result.content)
+        response = await client.chat.completions.create(
+            model=MODEL_ID, messages=messages, temperature=0
+        )
+        code = extract_python_code_block(response.choices[0].message.content)
 
         logger.info(f"Agent: {code}")
 
